@@ -3,10 +3,14 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.controllers.Calculator">
+<VBox prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.192" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.controllers.Calculator">
    <children>
-      <TextField fx:id="outputCalcState" editable="false" />
-      <TextField fx:id="outputCalcNum" editable="false" />
+      <VBox>
+         <children>
+            <TextField fx:id="outputCalcState" alignment="CENTER_RIGHT" editable="false" />
+            <TextField fx:id="outputCalcNum" alignment="CENTER_RIGHT" editable="false" />
+         </children>
+      </VBox>
       <GridPane fx:id="buttons" prefHeight="400.0" prefWidth="600.0">
          <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" />
@@ -41,6 +45,7 @@
             <Button fx:id="buttonC" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="C" />
             <Button fx:id="buttonCE" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="CE" GridPane.columnIndex="1" />
             <Button fx:id="buttonBackspace" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="Backspace" GridPane.columnIndex="2" />
+            <Button fx:id="buttonToggleHistory" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="&gt;&gt;" GridPane.columnIndex="3" />
          </children></GridPane>
    </children>
 </VBox>

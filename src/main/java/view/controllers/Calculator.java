@@ -2,10 +2,9 @@ package view.controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.ObjectPropertyBase;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.ReadOnlyStringProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -40,6 +39,7 @@ public class Calculator implements Initializable {
     @FXML private Button buttonC;
     @FXML private Button buttonCE;
     @FXML private Button buttonBackspace;
+    @FXML private Button buttonToggleHistory;
 
     private model.Calculator calculatorModel = null;
     private StringBinding leftArgAdapter = null;
@@ -48,6 +48,17 @@ public class Calculator implements Initializable {
     private StringBinding resultAdapter = null;
     private final SimpleStringProperty input = new SimpleStringProperty();
     private StringBinding output = createOutputStringBinding(input, null);
+
+    private BooleanProperty openHistory;
+    private ReadOnlyBooleanProperty historyOpened;
+
+    public void historyControl(BooleanProperty openHistory, ReadOnlyBooleanProperty historyOpened){
+        this.openHistory = openHistory;
+        this.historyOpened = historyOpened;
+        if(buttonToggleHistory != null){
+            initButtonToggleHistory();
+        }
+    }
 
     public void setCalculatorModel(model.Calculator calculatorModel){
         if(leftArgAdapter != null){
@@ -102,6 +113,9 @@ public class Calculator implements Initializable {
         buttonSub.setOnAction(event -> onActionButtonClick(ActionSub.NAME));
         buttonMul.setOnAction(event -> onActionButtonClick(ActionMul.NAME));
         buttonDiv.setOnAction(event -> onActionButtonClick(ActionDiv.NAME));
+        if(openHistory != null && historyOpened != null){
+            initButtonToggleHistory();
+        }
     }
 
     private void onNumberButtonClick(String text){
@@ -216,5 +230,11 @@ public class Calculator implements Initializable {
                 }
             }, input, result);
         }
+    }
+
+    private void initButtonToggleHistory(){
+        historyOpened.addListener((observable, oldValue, newValue) -> buttonToggleHistory.textProperty().set(newValue ? "<<" : ">>"));
+        buttonToggleHistory.setOnAction((event) -> openHistory.set(!historyOpened.get()));
+        buttonToggleHistory.textProperty().set(historyOpened.get() ? "<<" : ">>");
     }
 }
