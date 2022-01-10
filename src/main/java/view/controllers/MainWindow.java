@@ -8,9 +8,10 @@ import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
+import view.helpers.SPSaveWidthHelper;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,10 +23,12 @@ public class MainWindow implements Initializable {
 
     private model.Calculator calculatorModel = null;
     private Calculator calculatorController = null;
+    private Region calculatorNode = null;
 
     private final SimpleObjectProperty<model.History> historyModel = new SimpleObjectProperty<>();
     private History historyController = null;
-    private Node historyNode = null;
+    private Region historyNode = null;
+    private SPSaveWidthHelper historyWidthHelper = null;
     private final ReadOnlyBooleanWrapper historyOpened = new ReadOnlyBooleanWrapper(false);
     private final BooleanProperty openHistory = new SimpleBooleanProperty(false);
     private final ChangeListener<model.History> historyChangeListener = (observable, oldValue, newValue) -> {
@@ -47,11 +50,11 @@ public class MainWindow implements Initializable {
         panelsRoot.prefHeightProperty().bind(root.heightProperty());
         FXMLLoader calcLoader = new FXMLLoader(getClass().getResource("../Calculator.fxml"));
         try {
-            Node calcNode = calcLoader.load();
+            calculatorNode = calcLoader.load();
             calculatorController = calcLoader.getController();
             calculatorController.setCalculatorModel(calculatorModel);
             calculatorController.historyControl(openHistory, historyOpened.getReadOnlyProperty());
-            panelsRoot.getItems().add(calcNode);
+            panelsRoot.getItems().add(calculatorNode);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,12 +78,14 @@ public class MainWindow implements Initializable {
     public void openHistory(){
         if(historyNode != null || initHistoryNode()){
             panelsRoot.getItems().add(historyNode);
+            historyWidthHelper.afterAddRegion(1);
             historyOpened.set(true);
         }
     }
 
     public void closeHistory(){
         if(historyNode != null){
+            historyWidthHelper.beforeRemoveRegion();
             panelsRoot.getItems().remove(historyNode);
             historyOpened.set(false);
         }
@@ -92,6 +97,7 @@ public class MainWindow implements Initializable {
             historyNode = historyLoader.load();
             historyController = historyLoader.getController();
             historyController.setHistoryModel(historyModel.get());
+            historyWidthHelper = new SPSaveWidthHelper(panelsRoot, historyNode, historyNode.minWidth(panelsRoot.getHeight()));
             return true;
         } catch (IOException e) {
             e.printStackTrace();

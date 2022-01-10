@@ -6,7 +6,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.TextArea;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import model.data.HistoryItem;
 
@@ -30,7 +29,8 @@ public class History implements Initializable {
             displayItems = historyModel.getItems();
             historyAdapter = Bindings.createStringBinding(() -> {
                 StringBuilder s = new StringBuilder();
-                for (HistoryItem item : displayItems){
+                for (int i = displayItems.size() -1; i >= 0; i--){
+                    HistoryItem item = displayItems.get(i);
                     String left = item.getLeft().toString();
                     String right = item.getRight().toString();
                     s
