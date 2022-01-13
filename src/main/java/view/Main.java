@@ -26,6 +26,9 @@ public class Main extends Application {
             Parent root = loader.load();
             Scene scene = new Scene(root);
 
+            String css = this.getClass().getResource("/view/styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
+
             MainWindow mainController = loader.getController();
             Calculator calculatorModel = new Calculator();
             calculatorModel.historyProperty().set(new History());

@@ -1,10 +1,12 @@
 package model.actions;
 
+import model.data.Value;
+
 import java.math.BigDecimal;
 import java.util.HashMap;
 
 public abstract class AAction {
-    public abstract BigDecimal execute(BigDecimal left, BigDecimal right);
+    public abstract Value execute(Value left, Value right);
     public abstract String getName();
 
     public String buildMathExpression(String left, String right){
@@ -39,5 +41,7 @@ public abstract class AAction {
        creators.put(ActionSub.NAME, ActionSub::new);
        creators.put(ActionMul.NAME, ActionMul::new);
        creators.put(ActionDiv.NAME, ActionDiv::new);
+       creators.put(ActionPow.NAME, ActionPow::new);
+       creators.put(ActionRoot.NAME, ActionRoot::new);
    }
 }

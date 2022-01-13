@@ -2,22 +2,20 @@ package model.data;
 
 import model.actions.AAction;
 
-import java.math.BigDecimal;
-
 public class HistoryItem {
-    private final BigDecimal left;
+    private final Value left;
     private final AAction action;
-    private final BigDecimal right;
-    private final BigDecimal result;
+    private final Value right;
+    private final Value result;
 
-    public HistoryItem(BigDecimal left, AAction action, BigDecimal right, BigDecimal result) {
+    public HistoryItem(Value left, AAction action, Value right, Value result) {
         this.left = left;
         this.action = action;
         this.right = right;
         this.result = result;
     }
 
-    public BigDecimal getLeft() {
+    public Value getLeft() {
         return left;
     }
 
@@ -25,11 +23,11 @@ public class HistoryItem {
         return action;
     }
 
-    public BigDecimal getRight() {
+    public Value getRight() {
         return right;
     }
 
-    public BigDecimal getResult() {
+    public Value getResult() {
         return result;
     }
 }

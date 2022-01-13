@@ -2,12 +2,10 @@ package model.actions;
 
 import model.data.Value;
 
-import java.math.BigDecimal;
-
-public class ActionSub extends AAction{
+public class ActionPow extends AAction{
     @Override
     public Value execute(Value left, Value right) {
-        return new Value(left.get() - right.get());
+        return new Value(Math.pow(left.get(), right.get()));
     }
 
     @Override
@@ -15,5 +13,5 @@ public class ActionSub extends AAction{
         return NAME;
     }
 
-    public static final String NAME = "-";
+    public static final String NAME = "^";
 }

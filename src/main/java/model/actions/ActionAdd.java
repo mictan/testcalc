@@ -1,11 +1,13 @@
 package model.actions;
 
+import model.data.Value;
+
 import java.math.BigDecimal;
 
 public class ActionAdd extends AAction{
     @Override
-    public BigDecimal execute(BigDecimal left, BigDecimal right) {
-        return left.add(right);
+    public Value execute(Value left, Value right) {
+        return new Value(left.get() + right.get());
     }
 
     @Override

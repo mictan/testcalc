@@ -1,0 +1,9 @@
+.calc-button{
+    -fx-font-size: 17px;
+}
+.output{
+    -fx-font-size: 17px;
+}
+.output-expression{
+    -fx-text-inner-color: gray;
+}

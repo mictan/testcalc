@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -7,8 +8,16 @@
    <children>
       <VBox>
          <children>
-            <TextField fx:id="outputCalcState" alignment="CENTER_RIGHT" editable="false" />
-            <TextField fx:id="outputCalcNum" alignment="CENTER_RIGHT" editable="false" />
+            <TextField fx:id="outputCalcState" alignment="CENTER_RIGHT" editable="false">
+               <styleClass>
+                  <String fx:value="output" />
+                  <String fx:value="output-expression" />
+               </styleClass></TextField>
+            <TextField fx:id="outputCalcNum" alignment="CENTER_RIGHT" editable="false">
+               <styleClass>
+                  <String fx:value="output" />
+                  <String fx:value="output-input" />
+               </styleClass></TextField>
          </children>
       </VBox>
       <GridPane fx:id="buttons" prefHeight="400.0" prefWidth="600.0">
@@ -24,28 +33,33 @@
             <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
          <children>
-            <Button fx:id="buttonAdd" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="+" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="buttonSub" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="-" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="buttonMul" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="*" GridPane.columnIndex="3" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="buttonDiv" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="/" GridPane.columnIndex="3" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button1" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button2" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button3" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="3" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button4" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button5" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="5" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button6" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="6" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button7" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="7" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button8" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="8" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button9" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="9" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="button0" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="buttonSign" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="+/-" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
-            <Button fx:id="buttonDot" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="." GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonAdd" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="+" GridPane.columnIndex="3" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonSub" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="-" GridPane.columnIndex="3" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonMul" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="*" GridPane.columnIndex="3" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonDiv" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="/" GridPane.columnIndex="3" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonInvert" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="1/x" GridPane.columnIndex="4" GridPane.rowIndex="1" />
+            <Button fx:id="buttonRoot" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="root" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <Button fx:id="buttonPow" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="^" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <Button fx:id="buttonEq" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="=" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+            <Button fx:id="button1" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button2" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="2" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button3" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="3" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button4" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="4" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button5" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="5" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button6" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="6" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button7" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="7" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button8" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="8" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button9" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="9" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="button0" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonSign" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="+/-" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
+            <Button fx:id="buttonDot" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" styleClass="calc-button" text="." GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" GridPane.vgrow="ALWAYS" />
             <Button fx:id="buttonC" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="C" />
             <Button fx:id="buttonCE" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="CE" GridPane.columnIndex="1" />
             <Button fx:id="buttonBackspace" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="Backspace" GridPane.columnIndex="2" />
-            <Button fx:id="buttonToggleHistory" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="&gt;&gt;" GridPane.columnIndex="3" />
+            <Button fx:id="buttonToggleHistory" mnemonicParsing="false" prefHeight="Infinity" prefWidth="Infinity" text="&gt;&gt;" GridPane.columnIndex="4" />
          </children></GridPane>
    </children>
 </VBox>

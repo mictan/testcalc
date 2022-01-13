@@ -6,18 +6,19 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import model.actions.AAction;
 import model.data.HistoryItem;
+import model.data.Value;
 
 import java.math.BigDecimal;
 
 public class Calculator {
-    private SimpleObjectProperty<BigDecimal> leftArg = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<Value> leftArg = new SimpleObjectProperty<>();
     private SimpleObjectProperty<AAction> action = new SimpleObjectProperty<>();
-    private SimpleObjectProperty<BigDecimal> rightArg = new SimpleObjectProperty<>();
-    private ReadOnlyObjectWrapper<BigDecimal> result = new ReadOnlyObjectWrapper<>();
+    private SimpleObjectProperty<Value> rightArg = new SimpleObjectProperty<>();
+    private ReadOnlyObjectWrapper<Value> result = new ReadOnlyObjectWrapper<>();
 
     private SimpleObjectProperty<History> history = new SimpleObjectProperty<>();
 
-    public ObjectPropertyBase<BigDecimal> leftArgProperty(){
+    public ObjectPropertyBase<Value> leftArgProperty(){
         return leftArg;
     }
 
@@ -25,11 +26,11 @@ public class Calculator {
         return action;
     }
 
-    public ObjectPropertyBase<BigDecimal> rightArgProperty(){
+    public ObjectPropertyBase<Value> rightArgProperty(){
         return rightArg;
     }
 
-    public ReadOnlyObjectProperty<BigDecimal> resultProperty(){
+    public ReadOnlyObjectProperty<Value> resultProperty(){
         return result.getReadOnlyProperty();
     }
 
@@ -68,5 +69,30 @@ public class Calculator {
         action.set(null);
         rightArg.set(null);
         result.set(null);
+    }
+
+    public State saveState(){
+        return new State(leftArg.get(), action.get(), rightArg.get(), result.get());
+    }
+
+    public void loadState(State state){
+        leftArg.set(state.leftArg);
+        action.set(state.action);
+        rightArg.set(state.rightArg);
+        result.set(state.result);
+    }
+
+    public static class State{
+        private final Value leftArg;
+        private final AAction action;
+        private final Value rightArg;
+        private final Value result;
+
+        protected State(Value leftArg, AAction action, Value rightArg, Value result) {
+            this.leftArg = leftArg;
+            this.action = action;
+            this.rightArg = rightArg;
+            this.result = result;
+        }
     }
 }
