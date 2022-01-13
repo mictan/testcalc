@@ -8,7 +8,14 @@ import model.actions.AAction;
 import model.actions.ActionDiv;
 import model.data.Value;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SimpleCalculatorInputAdapter implements ICalculatorInput {
+    private static final Pattern fullExpressionRegex = Pattern.compile("(?<left>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)((?<action>[+\\-*/^])(?<right>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)?)?");
+    private static final Pattern actionExpressionRegex = Pattern.compile("(?<left>)?(?<action>[+\\-*/^])(?<right>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)?");
+    private static final Pattern rightExpressionRegex = Pattern.compile("(?<left>)?(?<action>)?(?<right>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)");
+    private static final Pattern fullOrActionExpressionRegex = Pattern.compile("(?<left>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)?((?<action>[+\\-*/^])(?<right>[-+]?\\d[\\d]+[.,]?[\\d]+([eE][-+]?\\d[\\d]+)?)?)?");
 
     private final model.Calculator calculatorModel;
     private final SimpleStringProperty input = new SimpleStringProperty();
@@ -150,6 +157,50 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
             return;
         }
         sendInputAndCalculateResultIfComplete(false);
+    }
+
+    @Override
+    public boolean tryParseExpression(String expression) {
+        String cleared = expression.replaceAll("[\\s]+", "");
+        try {
+            Pattern targetPattern;
+            if(calculatorModel.leftArgProperty().get() == null){
+                targetPattern = fullExpressionRegex;
+            } else if(calculatorModel.actionProperty().get() == null){
+                targetPattern = actionExpressionRegex;
+            } else if(calculatorModel.rightArgProperty().get() == null){
+                targetPattern = rightExpressionRegex;
+            } else {
+                calculatorModel.next();
+                targetPattern = fullOrActionExpressionRegex;
+            }
+            Matcher matcher = targetPattern.matcher(cleared);
+            if (matcher.find()) {
+                String left = matcher.group("left");
+                String action = matcher.group("action");
+                String right = matcher.group("right");
+                if (action != null && !action.isEmpty()) {
+                    calculatorModel.actionProperty().set(AAction.createByName(action));
+                }
+                if (left != null && !left.isEmpty()) {
+                    if (left.contains(",")) {
+                        left = left.replace(',', '.');
+                    }
+                    calculatorModel.leftArgProperty().set(new Value(left));
+                }
+                if (right != null && !right.isEmpty()) {
+                    if (right.contains(",")) {
+                        right = right.replace(',', '.');
+                    }
+                    calculatorModel.rightArgProperty().set(new Value(right));
+                }
+                calculatorModel.calculateResultIfComplete();
+                return true;
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     private boolean sendInputAndCalculateResultIfComplete(boolean next){

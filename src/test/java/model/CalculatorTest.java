@@ -40,4 +40,50 @@ public class CalculatorTest {
         Assertions.assertSame(calculator.resultProperty().get(), BigDecimal.valueOf(8));
         Assertions.assertSame(history.getItems().size(), 2);
     }
+
+    @Test
+    public void testExpr(){
+        AAction.init();
+        Calculator calculator = new Calculator();
+        SimpleCalculatorInputAdapter adapter = new SimpleCalculatorInputAdapter(calculator);
+        adapter.tryParseExpression("-123.456");
+        checkCalculatorState(calculator, -123.456, null, null);
+        calculator.reset();
+        adapter.tryParseExpression("-123.456 + ");
+        checkCalculatorState(calculator, -123.456, AAction.createByName(ActionAdd.NAME), null);
+        calculator.reset();
+        adapter.tryParseExpression("-123.456 + -123456");
+        checkCalculatorState(calculator, -123.456, AAction.createByName(ActionAdd.NAME), -123456.0);
+        calculator.reset();
+        adapter.tryParseExpression("-123.456");
+        checkCalculatorState(calculator, -123.456, null, null);
+        adapter.tryParseExpression("+");
+        checkCalculatorState(calculator, -123.456, AAction.createByName(ActionAdd.NAME), null);
+        adapter.tryParseExpression("-123.456");
+        checkCalculatorState(calculator, -123.456, AAction.createByName(ActionAdd.NAME), -123456.0);
+    }
+
+    private void checkCalculatorState(Calculator calculator, Double left, AAction action, Double right){
+        Value rleft = calculator.leftArgProperty().get();
+        AAction raction = calculator.actionProperty().get();
+        Value rright = calculator.rightArgProperty().get();
+        if(left != null){
+            Assertions.assertNotNull(rleft);
+            Assertions.assertEquals(rleft.get(), left);
+        } else {
+            Assertions.assertNull(rleft);
+        }
+        if(action != null){
+            Assertions.assertNotNull(raction);
+            Assertions.assertEquals(raction, action);
+        } else {
+            Assertions.assertNull(raction);
+        }
+        if(right != null){
+            Assertions.assertNotNull(rright);
+            Assertions.assertEquals(rright.get(), right);
+        } else {
+            Assertions.assertNull(rright);
+        }
+    }
 }

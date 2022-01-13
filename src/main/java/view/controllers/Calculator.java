@@ -9,14 +9,29 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCharacterCombination;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;
+import javafx.util.Pair;
 import model.ICalculatorInput;
 import model.SimpleCalculatorOutputWrapper;
 import model.actions.*;
 
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
+
+import static javafx.scene.input.KeyCode.*;
 
 public class Calculator implements Initializable {
     @FXML private Region calculatorRoot;
@@ -54,6 +69,9 @@ public class Calculator implements Initializable {
 
     private BooleanProperty openHistory;
     private ReadOnlyBooleanProperty historyOpened;
+
+    private HashMap<KeyCode, Runnable> keyBindings = new HashMap<>();
+    private HashMap<KeyCode, Runnable> keyBindingsShift = new HashMap<>();
 
     public void historyControl(BooleanProperty openHistory, ReadOnlyBooleanProperty historyOpened){
         this.openHistory = openHistory;
@@ -115,6 +133,10 @@ public class Calculator implements Initializable {
         if(openHistory != null && historyOpened != null){
             initButtonToggleHistory();
         }
+        calculatorRoot.setOnKeyPressed(this::onKeyPressed);
+        outputCalcState.setOnKeyPressed(this::onKeyPressed);
+        outputCalcNum.setOnKeyPressed(this::onKeyPressed);
+        initKeyBindings();
     }
 
     private void onNumberButtonClick(String text){
@@ -151,6 +173,77 @@ public class Calculator implements Initializable {
 
     private void onEqButtonClick(){
         inputAdapter.onEqClick();
+    }
+
+    private void onKeyPressed(KeyEvent event){
+        System.out.println(event);
+        KeyCode code = event.getCode();
+        if(keyBindingsShift.containsKey(code)) {
+            keyBindingsShift.get(code).run();
+        } else if(keyBindings.containsKey(code)){
+            keyBindings.get(code).run();
+        } else {
+            if(event.isControlDown()){
+                if(code == V){
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    try {
+                        Object data = clipboard.getData(DataFlavor.stringFlavor);
+                        if (data instanceof String){
+                            inputAdapter.tryParseExpression((String) data);
+                        }
+                    } catch (UnsupportedFlavorException | IOException e) {
+                        e.printStackTrace();
+                    }
+                } else if(code == C){
+                    if(event.getTarget() == outputCalcState || event.getTarget() == outputCalcNum){//Они сами обрабатываются
+                        return;
+                    }
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    String s = outputCalcNum.getText();
+                    clipboard.setContents(new StringSelection(s), null);
+                }
+            }
+        }
+    }
+
+    private void initKeyBindings(){
+        keyBindings.put(EQUALS, this::onEqButtonClick);
+        keyBindings.put(ENTER, keyBindings.get(EQUALS));
+        keyBindings.put(DIGIT0, ()->{onNumberButtonClick("0");});
+        keyBindings.put(DIGIT1, ()->{onNumberButtonClick("1");});
+        keyBindings.put(DIGIT2, ()->{onNumberButtonClick("2");});
+        keyBindings.put(DIGIT3, ()->{onNumberButtonClick("3");});
+        keyBindings.put(DIGIT4, ()->{onNumberButtonClick("4");});
+        keyBindings.put(DIGIT5, ()->{onNumberButtonClick("5");});
+        keyBindings.put(DIGIT6, ()->{onNumberButtonClick("6");});
+        keyBindings.put(DIGIT7, ()->{onNumberButtonClick("7");});
+        keyBindings.put(DIGIT8, ()->{onNumberButtonClick("8");});
+        keyBindings.put(DIGIT9, ()->{onNumberButtonClick("9");});
+        keyBindings.put(NUMPAD0, keyBindings.get(DIGIT0));
+        keyBindings.put(NUMPAD1, keyBindings.get(DIGIT1));
+        keyBindings.put(NUMPAD2, keyBindings.get(DIGIT2));
+        keyBindings.put(NUMPAD3, keyBindings.get(DIGIT3));
+        keyBindings.put(NUMPAD4, keyBindings.get(DIGIT4));
+        keyBindings.put(NUMPAD5, keyBindings.get(DIGIT5));
+        keyBindings.put(NUMPAD6, keyBindings.get(DIGIT6));
+        keyBindings.put(NUMPAD7, keyBindings.get(DIGIT7));
+        keyBindings.put(NUMPAD8, keyBindings.get(DIGIT8));
+        keyBindings.put(NUMPAD9, keyBindings.get(DIGIT9));
+        keyBindings.put(ADD, () -> {onActionButtonClick(ActionAdd.NAME);});
+        keyBindings.put(PLUS, keyBindings.get(ADD));
+        keyBindings.put(SUBTRACT, () -> {onActionButtonClick(ActionSub.NAME);});
+        keyBindings.put(MINUS, keyBindings.get(SUBTRACT));
+        keyBindings.put(DIVIDE, () -> {onActionButtonClick(ActionDiv.NAME);});
+        keyBindings.put(SLASH, keyBindings.get(DIVIDE));
+        keyBindings.put(MULTIPLY, () -> {onActionButtonClick(ActionMul.NAME);});
+        keyBindings.put(STAR, keyBindings.get(MULTIPLY));
+        keyBindings.put(COMMA, this::onDotButtonClick);
+        keyBindings.put(PERIOD, this::onDotButtonClick);
+        keyBindings.put(BACK_SPACE, this::onBackspaceButtonClick);
+        keyBindingsShift.put(DIGIT6, () -> {onActionButtonClick(ActionPow.NAME);});
+        keyBindingsShift.put(DIGIT8, keyBindings.get(MULTIPLY));
+        keyBindingsShift.put(EQUALS, keyBindings.get(ADD));
+        keyBindingsShift.put(BACK_SLASH, keyBindings.get(DIVIDE));
     }
 
     private StringBinding createOutputStringBinding(ReadOnlyStringProperty input, StringBinding result, ReadOnlyBooleanProperty displayInput){

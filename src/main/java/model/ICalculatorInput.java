@@ -15,4 +15,5 @@ public interface ICalculatorInput {
     void onCClick();
     void onCEClick();
     void onEqClick();
+    boolean tryParseExpression(String expression);
 }
