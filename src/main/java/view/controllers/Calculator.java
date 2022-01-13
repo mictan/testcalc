@@ -247,7 +247,12 @@ public class Calculator implements Initializable {
         }
         if(!resultAdapter.get().isEmpty() || calculatorModel.calculateResultIfComplete()){
             if(next){
-                calculatorModel.next();
+                if(displayInput.get()){//Если мы начали печатать поверх старого результата то сбрасываем его.
+                    calculatorModel.reset();
+                    return sendInput(calculatorModel.leftArgProperty());
+                } else {
+                    calculatorModel.next();
+                }
             }
             return true;
         }
