@@ -11,6 +11,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
+import model.ICalculatorInput;
+import model.SimpleCalculatorInputAdapter;
 import view.helpers.SPSaveWidthHelper;
 
 import java.io.IOException;
@@ -22,6 +24,7 @@ public class MainWindow implements Initializable {
     @FXML private SplitPane panelsRoot;
 
     private model.Calculator calculatorModel = null;
+    private ICalculatorInput calculatorInput = null;
     private Calculator calculatorController = null;
     private Region calculatorNode = null;
 
@@ -52,7 +55,7 @@ public class MainWindow implements Initializable {
         try {
             calculatorNode = calcLoader.load();
             calculatorController = calcLoader.getController();
-            calculatorController.setCalculatorModel(calculatorModel);
+            calculatorController.setCalculator(calculatorModel, calculatorInput);
             calculatorController.historyControl(openHistory, historyOpened.getReadOnlyProperty());
             panelsRoot.getItems().add(calculatorNode);
         } catch (IOException e) {
@@ -64,14 +67,16 @@ public class MainWindow implements Initializable {
 
     public void setCalculatorModel(model.Calculator model){
         calculatorModel = model;
-        if(calculatorController != null){
-            calculatorController.setCalculatorModel(calculatorModel);
-        }
         if(model != null){
+            calculatorInput = new SimpleCalculatorInputAdapter(model);
             historyModel.bind(model.historyProperty());
         } else {
+            calculatorInput = null;
             historyModel.unbind();
             historyModel.set(null);
+        }
+        if(calculatorController != null){
+            calculatorController.setCalculator(calculatorModel, calculatorInput);
         }
     }
 

@@ -2,19 +2,24 @@ package view.controllers;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Region;
+import model.ICalculatorInput;
+import model.SimpleCalculatorOutputWrapper;
 import model.actions.*;
-import model.data.Value;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class Calculator implements Initializable {
+    @FXML private Region calculatorRoot;
     @FXML private TextField outputCalcState;
     @FXML private TextField outputCalcNum;
     @FXML private GridPane buttons;
@@ -43,14 +48,9 @@ public class Calculator implements Initializable {
     @FXML private Button buttonBackspace;
     @FXML private Button buttonToggleHistory;
 
-    private model.Calculator calculatorModel = null;
-    private StringBinding leftArgAdapter = null;
-    private StringBinding rightArgAdapter = null;
-    private StringBinding mathExpressionAdapter = null;
-    private StringBinding resultAdapter = null;
-    private final SimpleStringProperty input = new SimpleStringProperty();
-    private final BooleanProperty displayInput = new SimpleBooleanProperty(false);
-    private StringBinding output = createOutputStringBinding(input, null, displayInput);
+    private ICalculatorInput inputAdapter = null;
+    private SimpleCalculatorOutputWrapper outputAdapter = null;
+    private StringBinding output = null;
 
     private BooleanProperty openHistory;
     private ReadOnlyBooleanProperty historyOpened;
@@ -63,30 +63,18 @@ public class Calculator implements Initializable {
         }
     }
 
-    public void setCalculatorModel(model.Calculator calculatorModel){
-        if(leftArgAdapter != null){
-            leftArgAdapter.dispose();
+    public void setCalculator(model.Calculator calculator, ICalculatorInput inputAdapter){
+        if(output != null){
+            output.dispose();
         }
-        if(rightArgAdapter != null){
-            rightArgAdapter.dispose();
-        }
-        if(mathExpressionAdapter != null){
-            mathExpressionAdapter.dispose();
-        }
-        if(resultAdapter != null){
-            resultAdapter.dispose();
-        }
-        output.dispose();
-        this.calculatorModel = calculatorModel;
-        if(calculatorModel != null) {
-            leftArgAdapter = createStringBinding(calculatorModel.leftArgProperty());
-            rightArgAdapter = createStringBinding(calculatorModel.rightArgProperty());
-            mathExpressionAdapter = createMathExpressionStringBinding(leftArgAdapter, calculatorModel.actionProperty(), rightArgAdapter);
-            resultAdapter = createStringBinding(calculatorModel.resultProperty());
-            output = createOutputStringBinding(input, resultAdapter, displayInput);
+        outputCalcState.textProperty().unbind();
+        this.inputAdapter = inputAdapter;
+        if(inputAdapter != null && calculator != null){
+            this.outputAdapter = new SimpleCalculatorOutputWrapper(calculator);
             if (outputCalcState != null) {
-                outputCalcState.textProperty().bind(mathExpressionAdapter);
+                outputCalcState.textProperty().bind(outputAdapter.mathExpressionProperty());
             }
+            output = createOutputStringBinding(inputAdapter.inputProperty(), outputAdapter.resultProperty(), inputAdapter.displayInputProperty());
             if (outputCalcNum != null) {
                 outputCalcNum.textProperty().bind(output);
             }
@@ -95,9 +83,11 @@ public class Calculator implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        outputCalcNum.textProperty().bind(output);
-        if(mathExpressionAdapter != null){
-            outputCalcState.textProperty().bind(mathExpressionAdapter);
+        if(output != null){
+            outputCalcNum.textProperty().bind(output);
+        }
+        if(outputAdapter != null){
+            outputCalcState.textProperty().bind(outputAdapter.mathExpressionProperty());
         }
         button1.setOnAction(event -> onNumberButtonClick("1"));
         button2.setOnAction(event -> onNumberButtonClick("2"));
@@ -128,193 +118,49 @@ public class Calculator implements Initializable {
     }
 
     private void onNumberButtonClick(String text){
-        displayInput.set(true);
-        String value = input.getValue();
-        if(value == null || value.isEmpty() || value.equals("0")){
-            value = "";
-        }
-        input.setValue(value + text);
+        inputAdapter.onNumberClick(text);
     }
 
     private void onDotButtonClick(){
-        displayInput.set(true);
-        String value = input.getValue();
-        if(value == null || value.isEmpty() || value.equals("0")){
-            value = "0.";
-        } else if(value.indexOf('.') == -1){
-            value = value + '.';
-        }
-        input.setValue(value);
+        inputAdapter.onDotClick();
     }
 
     private void onBackspaceButtonClick(){
-        displayInput.set(true);
-        String value = input.getValue();
-        if(value == null || value.isEmpty()){
-            value = "";
-        } else {
-            value = value.substring(0, value.length() - 1);
-            if(value.equals("-")){
-                value = "";
-            }
-        }
-        input.setValue(value);
+        inputAdapter.onBackspaceClick();
     }
 
     private void onSignButtonClick(){
-        String value = input.getValue();
-        if(value == null || value.isEmpty() || value.equals("0")){
-            value = output.getValue();//send result to input
-        }
-        if(value == null || value.isEmpty() || value.equals("0")){
-            return;
-        }
-        displayInput.set(true);
-        if(value.charAt(0) == '-'){
-            value = value.substring(1);
-        } else {
-            value = "-" + value;
-        }
-        input.setValue(value);
+        inputAdapter.onSignClick();
     }
 
     private void onActionButtonClick(String actionName){
-        if(calculatorModel == null){
-            return;
-        }
-        if(sendInputAndCalculateResultIfComplete(true)){
-            calculatorModel.actionProperty().set(AAction.createByName(actionName));
-        }
-        //calculatorModel.calculateResultIfComplete();//TODO unary operation?
+        inputAdapter.onActionClick(actionName);
     }
 
     private void onInvertButtonClick(){
-        if(calculatorModel == null){
-            return;
-        }
-        if(calculatorModel.resultProperty().get() == null && calculatorModel.leftArgProperty().get() != null){
-            model.Calculator.State state = calculatorModel.saveState();
-            calculatorModel.reset();
-            if(sendInput(calculatorModel.rightArgProperty())){
-                calculatorModel.leftArgProperty().set(new Value(1));
-                calculatorModel.actionProperty().set(AAction.createByName(ActionDiv.NAME));
-                if(calculatorModel.calculateResultIfComplete()){
-                    input.setValue(calculatorModel.resultProperty().get().toString());
-                    displayInput.set(true);
-                }
-            }
-            calculatorModel.loadState(state);
-        } else {
-            if(displayInput.get()){
-                calculatorModel.reset();
-                sendInput(calculatorModel.rightArgProperty());
-            } else {
-                calculatorModel.next();
-                calculatorModel.rightArgProperty().set(calculatorModel.leftArgProperty().get());
-            }
-            calculatorModel.leftArgProperty().set(new Value(1));
-            calculatorModel.actionProperty().set(AAction.createByName(ActionDiv.NAME));
-            calculatorModel.calculateResultIfComplete();
-        }
+        inputAdapter.onInvertClick();
     }
 
     private void onCClick(){
-        if(calculatorModel == null){
-            return;
-        }
-        input.setValue("");
-        calculatorModel.reset();
+        inputAdapter.onCClick();
     }
 
     private void onCEClick(){
-        if(!input.getValue().isEmpty()){
-            input.setValue("");
-        } else {
-            calculatorModel.reset();
-        }
+        inputAdapter.onCEClick();
     }
 
     private void onEqButtonClick(){
-        if(calculatorModel == null){
-            return;
-        }
-        sendInputAndCalculateResultIfComplete(false);
+        inputAdapter.onEqClick();
     }
 
-    private boolean sendInputAndCalculateResultIfComplete(boolean next){
-        if(calculatorModel == null){
-            return false;
-        }
-        if(!resultAdapter.get().isEmpty() || calculatorModel.calculateResultIfComplete()){
-            if(next){
-                if(displayInput.get()){//Если мы начали печатать поверх старого результата то сбрасываем его.
-                    calculatorModel.reset();
-                    return sendInput(calculatorModel.leftArgProperty());
-                } else {
-                    calculatorModel.next();
-                }
-            }
-            return true;
-        }
-        if(leftArgAdapter.get().isEmpty()){
-            return sendInput(calculatorModel.leftArgProperty());
-        } else if(rightArgAdapter.get().isEmpty()){
-            if(sendInput(calculatorModel.rightArgProperty()) && calculatorModel.calculateResultIfComplete() && next){
-                calculatorModel.next();
-            }
-        }
-        return true;
-    }
-
-    private boolean sendInput(ObjectPropertyBase<Value> target){
-        String value = input.getValue();
-        if(value == null || value.isEmpty()){
-            return false;
-        }
-        try{
-            target.set(new Value(value));
-            input.setValue("");
-            displayInput.set(false);
-            return true;
-        } catch (NumberFormatException e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    private StringBinding createStringBinding(ReadOnlyObjectProperty<Value> property){
+    private StringBinding createOutputStringBinding(ReadOnlyStringProperty input, StringBinding result, ReadOnlyBooleanProperty displayInput){
         return Bindings.createStringBinding(() -> {
-            Value left = property.get();
-            if(left != null){
-                return left.toString();
+            if(displayInput.get() || result.get() == null) {
+                return input.get();
             } else {
-                return "";
+                return result.get();
             }
-        }, property);
-    }
-
-    private StringBinding createMathExpressionStringBinding(StringBinding left, ReadOnlyObjectProperty<AAction> action, StringBinding right){
-        return Bindings.createStringBinding(() -> {
-            if(action.get() == null){
-                return left.get();
-            } else {
-                return action.get().buildMathExpression(left.get(), right.get());
-            }
-        }, left, action, right);
-    }
-
-    private StringBinding createOutputStringBinding(ReadOnlyStringProperty input, StringBinding result, BooleanProperty displayInput){
-        if(result == null){
-            return Bindings.createStringBinding(input::get, input);
-        } else {
-            return Bindings.createStringBinding(() -> {
-                if(displayInput.get() || result.get() == null) {
-                    return input.get();
-                } else {
-                    return result.get();
-                }
-            }, input, result, displayInput);
-        }
+        }, input, result, displayInput);
     }
 
     private void initButtonToggleHistory(){

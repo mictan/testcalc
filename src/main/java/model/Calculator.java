@@ -8,8 +8,6 @@ import model.actions.AAction;
 import model.data.HistoryItem;
 import model.data.Value;
 
-import java.math.BigDecimal;
-
 public class Calculator {
     private SimpleObjectProperty<Value> leftArg = new SimpleObjectProperty<>();
     private SimpleObjectProperty<AAction> action = new SimpleObjectProperty<>();
