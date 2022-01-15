@@ -8,6 +8,8 @@ import javafx.stage.Stage;
 import model.Calculator;
 import model.History;
 import model.actions.AAction;
+import model.database.HistoryDatabaseFacade;
+import model.helpers.FinalizePool;
 import view.controllers.MainWindow;
 
 import java.io.IOException;
@@ -31,7 +33,7 @@ public class Main extends Application {
 
             MainWindow mainController = loader.getController();
             Calculator calculatorModel = new Calculator();
-            calculatorModel.historyProperty().set(new History());
+            calculatorModel.historyProperty().set(new History().setDatabase(new HistoryDatabaseFacade()));
             mainController.setCalculatorModel(calculatorModel);
 
             primaryStage.setScene(scene);
@@ -40,5 +42,11 @@ public class Main extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        FinalizePool.getInstance().applyFinalize();
     }
 }

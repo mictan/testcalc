@@ -15,6 +15,22 @@ public abstract class AAction {
         return getName();
     }
 
+    @Override
+    public int hashCode() {
+        return getName().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj){
+            return true;
+        } else if(obj instanceof AAction){
+            return getName().equals(((AAction) obj).getName());
+        } else {
+            return false;
+        }
+    }
+
     public interface ICreator{
         AAction create();
     }
