@@ -3,19 +3,19 @@ package model.data;
 import model.actions.AAction;
 
 public class HistoryItem {
-    private final Value left;
+    private final Double left;
     private final AAction action;
-    private final Value right;
-    private final Value result;
+    private final Double right;
+    private final Double result;
 
-    public HistoryItem(Value left, AAction action, Value right, Value result) {
+    public HistoryItem(Double left, AAction action, Double right, Double result) {
         this.left = left;
         this.action = action;
         this.right = right;
         this.result = result;
     }
 
-    public Value getLeft() {
+    public Double getLeft() {
         return left;
     }
 
@@ -23,11 +23,11 @@ public class HistoryItem {
         return action;
     }
 
-    public Value getRight() {
+    public Double getRight() {
         return right;
     }
 
-    public Value getResult() {
+    public Double getResult() {
         return result;
     }
 }

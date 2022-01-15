@@ -1,12 +1,9 @@
 package model.actions;
 
-import model.data.Value;
-
-import java.math.BigDecimal;
 import java.util.HashMap;
 
 public abstract class AAction {
-    public abstract Value execute(Value left, Value right);
+    public abstract Double execute(Double left, Double right);
     public abstract String getName();
 
     public String buildMathExpression(String left, String right){

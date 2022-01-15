@@ -6,17 +6,16 @@ import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import model.actions.AAction;
 import model.data.HistoryItem;
-import model.data.Value;
 
 public class Calculator {
-    private SimpleObjectProperty<Value> leftArg = new SimpleObjectProperty<>();
+    private SimpleObjectProperty<Double> leftArg = new SimpleObjectProperty<>();
     private SimpleObjectProperty<AAction> action = new SimpleObjectProperty<>();
-    private SimpleObjectProperty<Value> rightArg = new SimpleObjectProperty<>();
-    private ReadOnlyObjectWrapper<Value> result = new ReadOnlyObjectWrapper<>();
+    private SimpleObjectProperty<Double> rightArg = new SimpleObjectProperty<>();
+    private ReadOnlyObjectWrapper<Double> result = new ReadOnlyObjectWrapper<>();
 
     private SimpleObjectProperty<History> history = new SimpleObjectProperty<>();
 
-    public ObjectPropertyBase<Value> leftArgProperty(){
+    public ObjectPropertyBase<Double> leftArgProperty(){
         return leftArg;
     }
 
@@ -24,11 +23,11 @@ public class Calculator {
         return action;
     }
 
-    public ObjectPropertyBase<Value> rightArgProperty(){
+    public ObjectPropertyBase<Double> rightArgProperty(){
         return rightArg;
     }
 
-    public ReadOnlyObjectProperty<Value> resultProperty(){
+    public ReadOnlyObjectProperty<Double> resultProperty(){
         return result.getReadOnlyProperty();
     }
 
@@ -81,12 +80,12 @@ public class Calculator {
     }
 
     public static class State{
-        private final Value leftArg;
+        private final Double leftArg;
         private final AAction action;
-        private final Value rightArg;
-        private final Value result;
+        private final Double rightArg;
+        private final Double result;
 
-        protected State(Value leftArg, AAction action, Value rightArg, Value result) {
+        protected State(Double leftArg, AAction action, Double rightArg, Double result) {
             this.leftArg = leftArg;
             this.action = action;
             this.rightArg = rightArg;

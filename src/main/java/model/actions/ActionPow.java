@@ -1,11 +1,9 @@
 package model.actions;
 
-import model.data.Value;
-
 public class ActionPow extends AAction{
     @Override
-    public Value execute(Value left, Value right) {
-        return new Value(Math.pow(left.get(), right.get()));
+    public Double execute(Double left, Double right) {
+        return Math.pow(left, right);
     }
 
     @Override

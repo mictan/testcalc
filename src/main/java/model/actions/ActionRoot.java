@@ -1,14 +1,12 @@
 package model.actions;
 
-import model.data.Value;
-
 public class ActionRoot extends AAction{
     @Override
-    public Value execute(Value left, Value right) {
-        if(right.get() == 0){
-            return new Value(Double.NaN);
+    public Double execute(Double left, Double right) {
+        if(right == 0){
+            return 1.0;
         }
-        return new Value(Math.pow(left.get(), 1.0 / right.get()));
+        return Math.pow(left, 1.0 / right);
     }
 
     @Override

@@ -1,14 +1,9 @@
 package model.actions;
 
-import model.data.Value;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-
 public class ActionDiv extends AAction{
     @Override
-    public Value execute(Value left, Value right) {
-        return new Value(left.get() / right.get());
+    public Double execute(Double left, Double right) {
+        return left / right;
     }
 
     @Override

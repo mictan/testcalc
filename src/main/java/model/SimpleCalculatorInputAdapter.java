@@ -6,7 +6,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import model.actions.AAction;
 import model.actions.ActionDiv;
-import model.data.Value;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -74,7 +73,7 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
     public void onSignClick(){
         String value = input.getValue();
         if(value == null || value.isEmpty() || value.equals("0")){
-            Value lastResult = calculatorModel.resultProperty().get();//send result to input
+            Double lastResult = calculatorModel.resultProperty().get();//send result to input
             if(lastResult != null){
                 value = lastResult.toString();//send result to input
             }
@@ -111,7 +110,7 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
             model.Calculator.State state = calculatorModel.saveState();
             calculatorModel.reset();
             if(sendInput(calculatorModel.rightArgProperty())){
-                calculatorModel.leftArgProperty().set(new Value(1));
+                calculatorModel.leftArgProperty().set(1.0);
                 calculatorModel.actionProperty().set(AAction.createByName(ActionDiv.NAME));
                 if(calculatorModel.calculateResultIfComplete()){
                     input.setValue(calculatorModel.resultProperty().get().toString());
@@ -127,7 +126,7 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
                 calculatorModel.next();
                 calculatorModel.rightArgProperty().set(calculatorModel.leftArgProperty().get());
             }
-            calculatorModel.leftArgProperty().set(new Value(1));
+            calculatorModel.leftArgProperty().set(1.0);
             calculatorModel.actionProperty().set(AAction.createByName(ActionDiv.NAME));
             calculatorModel.calculateResultIfComplete();
         }
@@ -186,13 +185,13 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
                     if (left.contains(",")) {
                         left = left.replace(',', '.');
                     }
-                    calculatorModel.leftArgProperty().set(new Value(left));
+                    calculatorModel.leftArgProperty().set(Double.parseDouble(left));
                 }
                 if (right != null && !right.isEmpty()) {
                     if (right.contains(",")) {
                         right = right.replace(',', '.');
                     }
-                    calculatorModel.rightArgProperty().set(new Value(right));
+                    calculatorModel.rightArgProperty().set(Double.parseDouble(right));
                 }
                 calculatorModel.calculateResultIfComplete();
                 return true;
@@ -228,13 +227,13 @@ public class SimpleCalculatorInputAdapter implements ICalculatorInput {
         return true;
     }
 
-    private boolean sendInput(ObjectPropertyBase<Value> target){
+    private boolean sendInput(ObjectPropertyBase<Double> target){
         String value = input.getValue();
         if(value == null || value.isEmpty()){
             return false;
         }
         try{
-            target.set(new Value(value));
+            target.set(Double.parseDouble(value));
             input.setValue("");
             displayInput.set(false);
             return true;
