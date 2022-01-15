@@ -106,4 +106,15 @@ public class HistoryItem {
                 ", result=" + result +
                 '}';
     }
+
+    public static String valueToString(Double value){
+        if(value == null){
+            return "";
+        }
+        String string = Double.toString(value);
+        if(string.endsWith(".0")){
+            string = string.substring(0, string.length() - 2);
+        }
+        return string;
+    }
 }

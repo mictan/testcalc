@@ -31,11 +31,11 @@ public class History implements Initializable {
                 StringBuilder s = new StringBuilder();
                 for (int i = displayItems.size() -1; i >= 0; i--){
                     HistoryItem item = displayItems.get(i);
-                    String left = item.getLeft().toString();
-                    String right = item.getRight().toString();
+                    String left = HistoryItem.valueToString(item.getLeft());
+                    String right = HistoryItem.valueToString(item.getRight());
                     s
                             .append("\r\n")
-                            .append(item.getResult())
+                            .append(HistoryItem.valueToString(item.getResult()))
                             .append(" = ")
                             .append(item.getAction().buildMathExpression(left, right));
                 }

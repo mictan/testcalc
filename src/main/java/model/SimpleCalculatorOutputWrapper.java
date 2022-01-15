@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.StringBinding;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import model.actions.AAction;
+import model.data.HistoryItem;
 
 import java.io.Closeable;
 
@@ -39,9 +40,9 @@ public class SimpleCalculatorOutputWrapper implements Closeable {
 
     private static StringBinding createStringBinding(ReadOnlyObjectProperty<Double> property){
         return Bindings.createStringBinding(() -> {
-            Double left = property.get();
-            if(left != null){
-                return left.toString();
+            Double value = property.get();
+            if(value != null){
+                return HistoryItem.valueToString(value);
             } else {
                 return "";
             }
