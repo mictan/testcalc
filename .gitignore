@@ -3,6 +3,8 @@
 .gradle/
 gradle/
 build/
+
+#database test
 db/
 
 # Compiled class file

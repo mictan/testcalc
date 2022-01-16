@@ -46,4 +46,8 @@ public class History {
         }
         return this;
     }
+
+    public void clearItems() {
+        items.clear();
+    }
 }

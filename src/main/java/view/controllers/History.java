@@ -5,6 +5,7 @@ import javafx.beans.binding.StringBinding;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import model.data.HistoryItem;
@@ -14,6 +15,7 @@ import java.util.ResourceBundle;
 
 public class History implements Initializable {
     @FXML private VBox historyRoot;
+    @FXML private Button buttonClear;
     @FXML private TextArea historyView;
 
     private model.History historyModel = null;
@@ -57,5 +59,13 @@ public class History implements Initializable {
         }
         historyView.prefWidthProperty().bind(historyRoot.widthProperty());
         historyView.prefHeightProperty().bind(historyRoot.heightProperty());
+        buttonClear.setOnAction(event -> clearHistory());
+    }
+
+    private void clearHistory(){
+        if(historyModel == null){
+            return;
+        }
+        historyModel.clearItems();
     }
 }
