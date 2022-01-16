@@ -1,6 +1,7 @@
 package model.database;
 
 import model.data.HistoryItem;
+import model.data.User;
 import model.helpers.FinalizePool;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -31,7 +32,8 @@ public class HibernateUtil {
 
                         // Create MetadataSources
                         MetadataSources sources = new MetadataSources(registry)
-                                .addAnnotatedClass(HistoryItem.class);
+                                .addAnnotatedClass(HistoryItem.class)
+                                .addAnnotatedClass(User.class);
 
                         // Create Metadata
                         Metadata metadata = sources.getMetadataBuilder().build();
@@ -69,7 +71,7 @@ public class HibernateUtil {
             dbConnectionProperties.setProperty("hibernate.hbm2ddl.auto", "none");
             String url = dbConnectionProperties.getProperty("hibernate.connection.url");
             if(url != null && url.startsWith("jdbc:h2:file:")){
-                File file = new File(url.substring("jdbc:h2:file:".length()) + ".h2.db");
+                File file = new File(url.substring("jdbc:h2:file:".length()) + ".h2.db");//check first start
                 if(!file.exists()){
                     dbConnectionProperties.setProperty("hibernate.hbm2ddl.auto", "create");
                 }

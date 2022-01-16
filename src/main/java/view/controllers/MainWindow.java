@@ -49,8 +49,8 @@ public class MainWindow implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        panelsRoot.prefWidthProperty().bind(root.widthProperty());
-        panelsRoot.prefHeightProperty().bind(root.heightProperty());
+        /*panelsRoot.prefWidthProperty().bind(root.widthProperty());
+        panelsRoot.prefHeightProperty().bind(root.heightProperty());*/
         FXMLLoader calcLoader = new FXMLLoader(getClass().getResource("/view/Calculator.fxml"));
         try {
             calculatorNode = calcLoader.load();

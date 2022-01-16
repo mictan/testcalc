@@ -1,15 +1,11 @@
 package model.database.dao;
 
 import model.data.HistoryItem;
-import model.database.HibernateUtil;
-import org.hibernate.Session;
 
 import javax.persistence.criteria.CriteriaQuery;
 import java.util.Collection;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
-public class HistoryItemDAOImpl implements HistoryItemDAO{
+public class HistoryItemDAOImpl extends ADAO implements HistoryItemDAO{
     @Override
     public void add(Collection<HistoryItem> data) {
         withTransaction(session -> {
@@ -44,26 +40,5 @@ public class HistoryItemDAOImpl implements HistoryItemDAO{
                 session.delete(item);
             }
         });
-    }
-
-    private <R> R openSession(Function<Session, R> callable){
-        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return callable.apply(session);
-        }
-    }
-
-    private boolean withTransaction(Consumer<Session> callable){
-        try(Session session = HibernateUtil.getSessionFactory().openSession()) {
-            session.beginTransaction();
-            try {
-                callable.accept(session);
-                session.getTransaction().commit();
-                return true;
-            } catch (Exception e){
-                e.printStackTrace();
-                session.getTransaction().rollback();
-                return false;
-            }
-        }
     }
 }
