@@ -51,7 +51,7 @@ public class MainWindow implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         panelsRoot.prefWidthProperty().bind(root.widthProperty());
         panelsRoot.prefHeightProperty().bind(root.heightProperty());
-        FXMLLoader calcLoader = new FXMLLoader(getClass().getResource("../Calculator.fxml"));
+        FXMLLoader calcLoader = new FXMLLoader(getClass().getResource("/view/Calculator.fxml"));
         try {
             calculatorNode = calcLoader.load();
             calculatorController = calcLoader.getController();
@@ -97,7 +97,7 @@ public class MainWindow implements Initializable {
     }
 
     private boolean initHistoryNode(){
-        FXMLLoader historyLoader = new FXMLLoader(getClass().getResource("../History.fxml"));
+        FXMLLoader historyLoader = new FXMLLoader(getClass().getResource("/view/History.fxml"));
         try{
             historyNode = historyLoader.load();
             historyController = historyLoader.getController();

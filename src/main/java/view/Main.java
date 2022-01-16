@@ -24,7 +24,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) {
         try {
             AAction.init();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/MainWindow.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
 
