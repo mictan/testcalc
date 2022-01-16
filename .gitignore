@@ -3,6 +3,7 @@
 .gradle/
 gradle/
 build/
+db/
 
 # Compiled class file
 *.class
