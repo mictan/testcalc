@@ -8,6 +8,9 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
+import java.io.File;
+import java.util.Properties;
+
 public class HibernateUtil {
     private static StandardServiceRegistry registry;
     private static SessionFactory sessionFactory;
@@ -20,8 +23,10 @@ public class HibernateUtil {
                     try {
                         FinalizePool.getInstance().addFinalizer(finalizer);
                         // Create registry
+                        Properties props = loadDbProperties();
                         registry = new StandardServiceRegistryBuilder()
                                 .configure("model/hibernate.cfg.xml")
+                                .applySettings(props)
                                 .build();
 
                         // Create MetadataSources
@@ -55,5 +60,23 @@ public class HibernateUtil {
             sessionFactory.close();//org.hibernate.service.UnknownServiceException: Unknown service requested [org.hibernate.engine.jdbc.connections.spi.ConnectionProvider]
             sessionFactory = null;
         }*/
+    }
+
+    private static Properties loadDbProperties() {
+        Properties dbConnectionProperties = new Properties();
+        try {
+            dbConnectionProperties.load(Object.class.getResourceAsStream("/model/dbConnection.properties"));
+            dbConnectionProperties.setProperty("hibernate.hbm2ddl.auto", "none");
+            String url = dbConnectionProperties.getProperty("hibernate.connection.url");
+            if(url != null && url.startsWith("jdbc:h2:file:")){
+                File file = new File(url.substring("jdbc:h2:file:".length()) + ".h2.db");
+                if(!file.exists()){
+                    dbConnectionProperties.setProperty("hibernate.hbm2ddl.auto", "create");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dbConnectionProperties;
     }
 }
