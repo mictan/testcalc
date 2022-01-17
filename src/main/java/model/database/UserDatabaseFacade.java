@@ -14,11 +14,11 @@ public class UserDatabaseFacade {
     private final SimpleObjectProperty<User> currentUser = new SimpleObjectProperty<>(null);
     private final SimpleLongProperty currentUserId = new SimpleLongProperty(-1);//-1 = no user;
 
-    public User login(String username, String password){
+    public LoginResult login(String username, String password){
         User user = DAOFactory.getInstance().getUserDAO().getByName(username);
         if(user == null){
             changeCurrentUser(null);
-            return null;
+            return LoginResult.NOT_FOUND;
         }
         boolean passwordEquals;
         if(user.getPassword() == null || user.getPassword().isEmpty()){
@@ -28,10 +28,10 @@ public class UserDatabaseFacade {
         }
         if(passwordEquals){
             changeCurrentUser(user);
-            return user;
+            return LoginResult.SUCCESS;
         } else {
             changeCurrentUser(null);
-            return null;
+            return LoginResult.PASSWORD;
         }
     }
 
@@ -80,5 +80,9 @@ public class UserDatabaseFacade {
 
     public enum RegisterResult{
         SUCCESS, DUP_NAME
+    }
+
+    public enum LoginResult{
+        SUCCESS, NOT_FOUND, PASSWORD
     }
 }

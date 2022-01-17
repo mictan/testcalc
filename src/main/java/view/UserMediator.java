@@ -2,6 +2,7 @@ package view;
 
 import javafx.beans.binding.LongBinding;
 import javafx.beans.binding.ObjectBinding;
+import javafx.scene.control.Alert;
 import javafx.util.Pair;
 import model.data.User;
 import model.database.UserDatabaseFacade;
@@ -28,18 +29,34 @@ public class UserMediator {
     public void login(){
         Optional<Pair<String, String>> login = new LoginDialog().showSync();
         login.ifPresent(loginPair -> {
-            database.login(loginPair.getKey(), loginPair.getValue());
+            UserDatabaseFacade.LoginResult result = database.login(loginPair.getKey(), loginPair.getValue());
+            if(result == UserDatabaseFacade.LoginResult.NOT_FOUND){
+                alert("User not found", "User " + loginPair.getKey() + " is not registered");
+            } else if(result == UserDatabaseFacade.LoginResult.PASSWORD){
+                alert("Incorrect password", "Password doesn't match");
+            }
         });
     }
 
     public void register(){
         Optional<Pair<String, String>> register = new RegisterDialog().showSync();
         register.ifPresent(registerPair -> {
-            database.register(registerPair.getKey(), registerPair.getValue());
+            UserDatabaseFacade.RegisterResult result = database.register(registerPair.getKey(), registerPair.getValue());
+            if(result == UserDatabaseFacade.RegisterResult.DUP_NAME){
+                alert("User already registered", "User " + registerPair.getKey() + " already registered");
+            }
         });
     }
 
     public void logout(){
         database.logout();
+    }
+
+    private void alert(String title, String message){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(message);
+
+        alert.showAndWait();
     }
 }
