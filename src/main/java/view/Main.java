@@ -9,6 +9,7 @@ import model.Calculator;
 import model.History;
 import model.actions.AAction;
 import model.database.HistoryDatabaseFacade;
+import model.database.UserDatabaseFacade;
 import model.helpers.FinalizePool;
 import view.controllers.MainWindow;
 
@@ -33,8 +34,13 @@ public class Main extends Application {
 
             MainWindow mainController = loader.getController();
             Calculator calculatorModel = new Calculator();
-            calculatorModel.historyProperty().set(new History().setDatabase(new HistoryDatabaseFacade()));
+            UserMediator userMediator = new UserMediator(new UserDatabaseFacade());
+            HistoryDatabaseFacade facade = new HistoryDatabaseFacade();
+            facade.userIdProperty().bind(userMediator.createCurrentUserIdBinding());
+            History history = new History().setDatabase(facade);
+            calculatorModel.historyProperty().set(history);
             mainController.setCalculatorModel(calculatorModel);
+            mainController.setUserMediator(userMediator);
 
             primaryStage.setScene(scene);
             primaryStage.setTitle("Calculator");

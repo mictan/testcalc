@@ -6,6 +6,7 @@ import javax.persistence.*;
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(name = "names", columnNames = {"name"}))
 public class User {
     @Id
+    @GeneratedValue
     @Column(name = "id", nullable = false)
     private Long id;
     @Column(name = "name", nullable = false)

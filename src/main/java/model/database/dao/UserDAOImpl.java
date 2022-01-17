@@ -2,6 +2,7 @@ package model.database.dao;
 
 import model.data.User;
 
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -36,7 +37,11 @@ public class UserDAOImpl extends ADAO implements UserDAO{
             CriteriaQuery<User> query = builder.createQuery(User.class);
             Root<User> from = query.from(User.class);
             query.select(from).where(builder.equal(from.get("name"), userName));
-            return session.createQuery(query).getSingleResult();
+            try {
+                return session.createQuery(query).getSingleResult();
+            } catch (NoResultException e){
+                return null;
+            }
         });
     }
 

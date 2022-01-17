@@ -4,15 +4,16 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import model.ICalculatorInput;
 import model.SimpleCalculatorInputAdapter;
+import view.UserMediator;
 import view.helpers.SPSaveWidthHelper;
 
 import java.io.IOException;
@@ -26,34 +27,41 @@ public class MainWindow implements Initializable {
     private model.Calculator calculatorModel = null;
     private ICalculatorInput calculatorInput = null;
     private Calculator calculatorController = null;
-    private Region calculatorNode = null;
+
+    private MainMenu menuController = null;
+    private UserMediator userMediator = null;
 
     private final SimpleObjectProperty<model.History> historyModel = new SimpleObjectProperty<>();
     private History historyController = null;
-    private Region historyNode = null;
     private SPSaveWidthHelper historyWidthHelper = null;
     private final ReadOnlyBooleanWrapper historyOpened = new ReadOnlyBooleanWrapper(false);
     private final BooleanProperty openHistory = new SimpleBooleanProperty(false);
-    private final ChangeListener<model.History> historyChangeListener = (observable, oldValue, newValue) -> {
-        if(historyController != null){
-            historyController.setHistoryModel(newValue);
-        }
-    };
-    private final ChangeListener<Boolean> openHistoryChangeListener = (observable, oldValue, newValue) -> {
-        if(newValue){
-            openHistory();
-        } else {
-            closeHistory();
-        }
-    };
+
+    public MainWindow() {
+        historyModel.addListener((observable, oldValue, newValue) -> {
+            if(historyController != null){
+                historyController.setHistoryModel(newValue);
+            }
+        });
+        openHistory.addListener((observable, oldValue, newValue) -> {
+            if(newValue){
+                openHistory();
+            } else {
+                closeHistory();
+            }
+        });
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        /*panelsRoot.prefWidthProperty().bind(root.widthProperty());
-        panelsRoot.prefHeightProperty().bind(root.heightProperty());*/
+        initMainMenuNode();
+        initCalculatorNode();
+    }
+
+    private void initCalculatorNode(){
         FXMLLoader calcLoader = new FXMLLoader(getClass().getResource("/view/Calculator.fxml"));
         try {
-            calculatorNode = calcLoader.load();
+            Node calculatorNode = calcLoader.load();
             calculatorController = calcLoader.getController();
             calculatorController.setCalculator(calculatorModel, calculatorInput);
             calculatorController.historyControl(openHistory, historyOpened.getReadOnlyProperty());
@@ -61,8 +69,30 @@ public class MainWindow implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        historyModel.addListener(historyChangeListener);
-        openHistory.addListener(openHistoryChangeListener);
+    }
+
+    private void initMainMenuNode(){
+        FXMLLoader menuLoader = new FXMLLoader(getClass().getResource("/view/MainMenu.fxml"));
+        try {
+            Region menuNode = menuLoader.load();
+            menuController = menuLoader.getController();
+            if(userMediator != null){
+                menuController.setUserMediator(userMediator);
+            }
+            menuNode.heightProperty().addListener((observable, oldValue, newValue) -> {
+                AnchorPane.setTopAnchor(panelsRoot, menuNode.getHeight());
+            });
+            root.getChildren().add(menuNode);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setUserMediator(UserMediator userMediator){
+        this.userMediator = userMediator;
+        if(menuController != null){
+            menuController.setUserMediator(userMediator);
+        }
     }
 
     public void setCalculatorModel(model.Calculator model){
@@ -81,17 +111,17 @@ public class MainWindow implements Initializable {
     }
 
     public void openHistory(){
-        if(historyNode != null || initHistoryNode()){
-            panelsRoot.getItems().add(historyNode);
+        if(historyController != null || initHistoryNode()){
+            panelsRoot.getItems().add(historyController.getHistoryRoot());
             historyWidthHelper.afterAddRegion(1);
             historyOpened.set(true);
         }
     }
 
     public void closeHistory(){
-        if(historyNode != null){
+        if(historyController != null){
             historyWidthHelper.beforeRemoveRegion();
-            panelsRoot.getItems().remove(historyNode);
+            panelsRoot.getItems().remove(historyController.getHistoryRoot());
             historyOpened.set(false);
         }
     }
@@ -99,7 +129,7 @@ public class MainWindow implements Initializable {
     private boolean initHistoryNode(){
         FXMLLoader historyLoader = new FXMLLoader(getClass().getResource("/view/History.fxml"));
         try{
-            historyNode = historyLoader.load();
+            Region historyNode = historyLoader.load();
             historyController = historyLoader.getController();
             historyController.setHistoryModel(historyModel.get());
             historyWidthHelper = new SPSaveWidthHelper(panelsRoot, historyNode, historyNode.minWidth(panelsRoot.getHeight()));

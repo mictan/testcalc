@@ -2,11 +2,13 @@
 
 <?import javafx.scene.control.*?>
 
-<MenuBar xmlns="http://javafx.com/javafx/16" fx:controller="view.controllers.MainMenu" xmlns:fx="http://javafx.com/fxml/1">
+<MenuBar xmlns="http://javafx.com/javafx/8.0.192" fx:controller="view.controllers.MainMenu" xmlns:fx="http://javafx.com/fxml/1">
   <menus>
       <Menu fx:id="menuUserRoot" mnemonicParsing="false" text="User">
         <items>
           <MenuItem fx:id="menuUserLogin" mnemonicParsing="false" text="Login" />
+          <MenuItem fx:id="menuUserRegister" mnemonicParsing="false" text="Register" />
+          <MenuItem fx:id="menuUserLogout" mnemonicParsing="false" text="Logout" />
         </items>
       </Menu>
     <Menu mnemonicParsing="false" text="Help">

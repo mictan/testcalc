@@ -5,6 +5,7 @@ import model.database.converters.ActionToStringConverter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Objects;
 
 @Entity(name = "HistoryItem")
 @Table(name = "calc_history")
@@ -14,7 +15,7 @@ public class HistoryItem {
     @Column(name = "id")
     private Long id;
     @Column(name = "user_id", nullable = false)
-    private long userId = -1;
+    private Long userId = -1L;
     @Column(name = "time", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date time;
@@ -105,6 +106,24 @@ public class HistoryItem {
                 ", right=" + right +
                 ", result=" + result +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this){
+            return true;
+        } else if(obj instanceof HistoryItem){
+            HistoryItem o = (HistoryItem) obj;
+            return Objects.equals(id, o.id)
+                    && Objects.equals(userId, o.userId)
+                    && Objects.equals(time, o.time)
+                    && Objects.equals(left, o.left)
+                    && Objects.equals(action, o.action)
+                    && Objects.equals(right, o.right)
+                    && Objects.equals(result, o.result);
+        } else {
+            return false;
+        }
     }
 
     public static String valueToString(Double value){

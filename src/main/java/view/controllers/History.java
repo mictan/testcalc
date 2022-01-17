@@ -5,6 +5,7 @@ import javafx.beans.binding.StringBinding;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
@@ -21,6 +22,10 @@ public class History implements Initializable {
     private model.History historyModel = null;
     private ObservableList<HistoryItem> displayItems = null;
     private StringBinding historyAdapter = null;
+
+    public Node getHistoryRoot(){
+        return historyRoot;
+    }
 
     public void setHistoryModel(model.History historyModel){
         if(historyAdapter != null){

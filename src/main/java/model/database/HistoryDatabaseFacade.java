@@ -1,5 +1,7 @@
 package model.database;
 
+import javafx.beans.property.LongProperty;
+import javafx.beans.property.SimpleLongProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import model.data.HistoryItem;
@@ -10,12 +12,11 @@ import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HistoryDatabaseFacade implements Closeable {
+    private final LongProperty userId = new SimpleLongProperty(-1);//-1 = no user;
     private ObservableList<HistoryItem> items;
     private boolean processLoad = false;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -25,7 +26,7 @@ public class HistoryDatabaseFacade implements Closeable {
             if(processLoad){
                 return;
             }
-            ChangedTask task = new ChangedTask();
+            ChangedTask task = new ChangedTask(userId.get());
             while (c.next()){
                 if (c.wasPermutated()) {
                     //permutate
@@ -44,21 +45,15 @@ public class HistoryDatabaseFacade implements Closeable {
 
     public HistoryDatabaseFacade() {
         FinalizePool.getInstance().addFinalizer(this);
+        userId.addListener((observable, oldValue, newValue) -> executor.submit(new LoadTask(newValue.longValue())));
     }
 
     public void load(){
-        Collection<HistoryItem> items;
-        try {
-            items = executor.submit(new LoadTask()).get();
-            processLoad = true;
-            try {
-                this.items.addAll(items);//TODO merge values?
-            } finally {
-                processLoad = false;
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        executor.submit(new LoadTask(userId.get()));
+    }
+
+    public LongProperty userIdProperty() {
+        return userId;
     }
 
     public void setItems(ObservableList<HistoryItem> items) {
@@ -76,11 +71,27 @@ public class HistoryDatabaseFacade implements Closeable {
         executor.shutdown();
     }
 
-    private static class LoadTask implements Callable<Collection<HistoryItem>>{
+    private class LoadTask implements Runnable{
+        private final long userId;
+
+        public LoadTask(long userId) {
+            this.userId = userId;
+        }
 
         @Override
-        public Collection<HistoryItem> call() {
-            return DAOFactory.getInstance().getHistoryItemDAO().getAll();
+        public void run() {
+            try {
+                Collection<HistoryItem> newItems = DAOFactory.getInstance().getHistoryItemDAO().getByUserId(userId);
+                processLoad = true;
+                try {
+                    items.clear();
+                    items.addAll(newItems);//TODO merge values?
+                } finally {
+                    processLoad = false;
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -89,21 +100,34 @@ public class HistoryDatabaseFacade implements Closeable {
         private final List<HistoryItem> added = new ArrayList<>();
         private final List<HistoryItem> removed = new ArrayList<>();
 
+        private final long userId;
+
+        public ChangedTask(long userId) {
+            this.userId = userId;
+        }
+
         public boolean isEmpty(){
             return changed.isEmpty() && added.isEmpty() && removed.isEmpty();
         }
 
         @Override
         public void run() {
-            HistoryItemDAO dao = DAOFactory.getInstance().getHistoryItemDAO();
-            if(!changed.isEmpty()){
-                dao.update(changed);
-            }
-            if(!added.isEmpty()){
-                dao.add(added);
-            }
-            if(!removed.isEmpty()){
-                dao.delete(removed);
+            try {
+                HistoryItemDAO dao = DAOFactory.getInstance().getHistoryItemDAO();
+                if(!changed.isEmpty()){
+                    dao.update(changed);
+                }
+                if(!added.isEmpty()){
+                    for (HistoryItem item: added){//set user id to all new items
+                        item.setUserId(userId);
+                    }
+                    dao.add(added);
+                }
+                if(!removed.isEmpty()){
+                    dao.delete(removed);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
             }
         }
     }

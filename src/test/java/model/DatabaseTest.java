@@ -9,33 +9,31 @@ import model.data.HistoryItem;
 import model.database.DAOFactory;
 import model.database.HistoryDatabaseFacade;
 import model.database.dao.HistoryItemDAO;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 public class DatabaseTest {
     @Test
-    public void DAOTest(){
+    public void HistoryDAOTest(){
         AAction.init();
-        HistoryItemDAO historyItemDAO = DAOFactory.getInstance().getHistoryItemDAO();
+        HistoryItemDAO historyItemDAO = DAOFactory.getInstance().getHistoryItemDAO();;
         List<HistoryItem> items = Arrays.asList(
                 new HistoryItem(1., AAction.createByName(ActionAdd.NAME), 2., 3.)
                 , new HistoryItem(1., AAction.createByName(ActionAdd.NAME), 2., 3.)
         );
         for (int i = 0; i < items.size(); i++){
-            items.get(i).setTime(new Date(i * 10000L));
+            items.get(i).setTime(new Timestamp(i * 10000L));
+            items.get(i).setUserId(-20L);
         }
         historyItemDAO.add(items);
-        items.get(1).setUserId(22L);
-        historyItemDAO.update(items);
-        System.out.println("old");
-        for (HistoryItem item : items){
-            System.out.println(item);
-        }
-        System.out.println("new");
-        Collection<HistoryItem> all = historyItemDAO.getAll();
-        for (HistoryItem item : all){
-            System.out.println(item);
+        Collection<HistoryItem> all = historyItemDAO.getByUserId(-20L);
+        try{
+            Assertions.assertIterableEquals(items, all);
+        } finally {
+            historyItemDAO.delete(all);
         }
     }
 
@@ -48,13 +46,15 @@ public class DatabaseTest {
                 , new HistoryItem(1., AAction.createByName(ActionAdd.NAME), 2., 3.)
         );
         for (int i = 0; i < items.size(); i++){
-            items.get(i).setTime(new Date(i * 10000L));
+            items.get(i).setTime(new Timestamp(i * 10000L));
+            items.get(i).setUserId(-22L);
         }
         historyItemDAO.add(items);
         HistoryDatabaseFacade facade = new HistoryDatabaseFacade();
         ObservableList<HistoryItem> oItems = FXCollections.observableArrayList();
         facade.setItems(oItems);
-        facade.load();
+        facade.userIdProperty().setValue(-22);
+        Thread.sleep(100);
         oItems.add(new HistoryItem(1., AAction.createByName(ActionAdd.NAME), 2., 3.));
         Thread.sleep(100);
         oItems.add(new HistoryItem(10., AAction.createByName(ActionSub.NAME), 2., 8.));
@@ -68,9 +68,14 @@ public class DatabaseTest {
         oItems.add(new HistoryItem(50., AAction.createByName(ActionSub.NAME), 2., 48.));
         oItems.remove(0);
         Thread.sleep(100);
-        Collection<HistoryItem> all = historyItemDAO.getAll();
-        for (HistoryItem item : all){
+        Collection<HistoryItem> all = historyItemDAO.getByUserId(-22);
+        /*for (HistoryItem item : all){
             System.out.println(item);
+        }*/
+        try{
+            Assertions.assertEquals(all, oItems);
+        } finally {
+            oItems.clear();
         }
     }
 }

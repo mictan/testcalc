@@ -13,17 +13,15 @@ public abstract class ADAO {
         }
     }
 
-    protected boolean withTransaction(Consumer<Session> callable){
+    protected void withTransaction(Consumer<Session> callable){
         try(Session session = HibernateUtil.getSessionFactory().openSession()) {
             session.beginTransaction();
             try {
                 callable.accept(session);
                 session.getTransaction().commit();
-                return true;
             } catch (Exception e){
-                e.printStackTrace();
                 session.getTransaction().rollback();
-                return false;
+                throw e;
             }
         }
     }
