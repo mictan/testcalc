@@ -8,8 +8,8 @@ import javafx.stage.Stage;
 import model.Calculator;
 import model.History;
 import model.actions.AAction;
-import model.database.HistoryDatabaseFacade;
-import model.database.UserDatabaseFacade;
+import model.database.HistoryDatabaseProvider;
+import model.database.UserDatabaseProvider;
 import model.helpers.FinalizePool;
 import view.controllers.MainWindow;
 
@@ -34,10 +34,10 @@ public class Main extends Application {
 
             MainWindow mainController = loader.getController();
             Calculator calculatorModel = new Calculator();
-            UserMediator userMediator = new UserMediator(new UserDatabaseFacade());
-            HistoryDatabaseFacade facade = new HistoryDatabaseFacade();
-            facade.userIdProperty().bind(userMediator.createCurrentUserIdBinding());
-            History history = new History().setDatabase(facade);
+            UserMediator userMediator = new UserMediator(new UserDatabaseProvider());
+            HistoryDatabaseProvider historyProvider = new HistoryDatabaseProvider();
+            historyProvider.userIdProperty().bind(userMediator.createCurrentUserIdBinding());
+            History history = new History().setDatabase(historyProvider);
             calculatorModel.historyProperty().set(history);
             mainController.setCalculatorModel(calculatorModel);
             mainController.setUserMediator(userMediator);

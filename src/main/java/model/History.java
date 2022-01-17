@@ -5,13 +5,13 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.data.HistoryItem;
-import model.database.HistoryDatabaseFacade;
+import model.database.HistoryDatabaseProvider;
 
 public class History {
     private final ObservableList<HistoryItem> items = FXCollections.observableArrayList();
     private final ObservableList<HistoryItem> itemsRo = FXCollections.unmodifiableObservableList(items);
     private final IntegerProperty maxItems = new SimpleIntegerProperty(10);//negative = infinity;
-    private HistoryDatabaseFacade database = null;
+    private HistoryDatabaseProvider database = null;
 
     public ObservableList<HistoryItem> getItems() {
         return itemsRo;
@@ -35,7 +35,7 @@ public class History {
         return items.get(items.size() - 1);
     }
 
-    public History setDatabase(HistoryDatabaseFacade database){
+    public History setDatabase(HistoryDatabaseProvider database){
         if(this.database != null){
             this.database.setItems(null);
         }

@@ -11,11 +11,10 @@ import model.helpers.FinalizePool;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class HistoryDatabaseFacade implements Closeable {
+public class HistoryDatabaseProvider implements Closeable {
     private final LongProperty userId = new SimpleLongProperty(-1);//-1 = no user;
     private ObservableList<HistoryItem> items;
     private boolean processLoad = false;
@@ -43,7 +42,7 @@ public class HistoryDatabaseFacade implements Closeable {
         }
     };
 
-    public HistoryDatabaseFacade() {
+    public HistoryDatabaseProvider() {
         FinalizePool.getInstance().addFinalizer(this);
         userId.addListener((observable, oldValue, newValue) -> loadImpl(newValue.longValue()));
     }

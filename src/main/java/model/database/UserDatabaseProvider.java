@@ -10,7 +10,7 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import javax.persistence.PersistenceException;
 
-public class UserDatabaseFacade {
+public class UserDatabaseProvider {
     private final SimpleObjectProperty<User> currentUser = new SimpleObjectProperty<>(null);
     private final SimpleLongProperty currentUserId = new SimpleLongProperty(-1);//-1 = no user;
 

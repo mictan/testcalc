@@ -7,7 +7,7 @@ import model.actions.ActionAdd;
 import model.actions.ActionSub;
 import model.data.HistoryItem;
 import model.database.DAOFactory;
-import model.database.HistoryDatabaseFacade;
+import model.database.HistoryDatabaseProvider;
 import model.database.dao.HistoryItemDAO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ public class DatabaseTest {
             items.get(i).setUserId(-22L);
         }
         historyItemDAO.add(items);
-        HistoryDatabaseFacade facade = new HistoryDatabaseFacade();
+        HistoryDatabaseProvider facade = new HistoryDatabaseProvider();
         ObservableList<HistoryItem> oItems = FXCollections.observableArrayList();
         facade.setItems(oItems);
         facade.userIdProperty().setValue(-22);
