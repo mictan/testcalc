@@ -174,7 +174,7 @@ public class Calculator implements Initializable {
     private void onKeyPressed(KeyEvent event){
         System.out.println(event);
         KeyCode code = event.getCode();
-        if(keyBindingsShift.containsKey(code)) {
+        if(event.isShiftDown() && keyBindingsShift.containsKey(code)) {
             keyBindingsShift.get(code).run();
         } else if(keyBindings.containsKey(code)){
             keyBindings.get(code).run();

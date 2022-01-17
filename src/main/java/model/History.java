@@ -11,7 +11,7 @@ public class History {
     private final ObservableList<HistoryItem> items = FXCollections.observableArrayList();
     private final ObservableList<HistoryItem> itemsRo = FXCollections.unmodifiableObservableList(items);
     private final IntegerProperty maxItems = new SimpleIntegerProperty(10);//negative = infinity;
-    private HistoryDatabaseFacade databaseDriver = null;
+    private HistoryDatabaseFacade database = null;
 
     public ObservableList<HistoryItem> getItems() {
         return itemsRo;
@@ -35,14 +35,14 @@ public class History {
         return items.get(items.size() - 1);
     }
 
-    public History setDatabase(HistoryDatabaseFacade databaseDriver){
-        if(this.databaseDriver != null){
-            this.databaseDriver.setItems(null);
+    public History setDatabase(HistoryDatabaseFacade database){
+        if(this.database != null){
+            this.database.setItems(null);
         }
-        this.databaseDriver = databaseDriver;
-        if(databaseDriver != null){
-            databaseDriver.setItems(items);
-            databaseDriver.load();
+        this.database = database;
+        if(database != null){
+            database.setItems(items);
+            database.load();
         }
         return this;
     }

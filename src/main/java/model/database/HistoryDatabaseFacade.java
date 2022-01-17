@@ -11,9 +11,9 @@ import model.helpers.FinalizePool;
 import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class HistoryDatabaseFacade implements Closeable {
     private final LongProperty userId = new SimpleLongProperty(-1);//-1 = no user;
@@ -45,11 +45,27 @@ public class HistoryDatabaseFacade implements Closeable {
 
     public HistoryDatabaseFacade() {
         FinalizePool.getInstance().addFinalizer(this);
-        userId.addListener((observable, oldValue, newValue) -> executor.submit(new LoadTask(newValue.longValue())));
+        userId.addListener((observable, oldValue, newValue) -> loadImpl(newValue.longValue()));
     }
 
     public void load(){
-        executor.submit(new LoadTask(userId.get()));
+        loadImpl(userId.get());
+    }
+
+    private void loadImpl(long userId){
+        Future<Collection<HistoryItem>> submit = executor.submit(new LoadTask(userId));
+        try {
+            Collection<HistoryItem> newItems = submit.get();
+            processLoad = true;
+            try {
+                items.clear();
+                items.addAll(newItems);//TODO merge values?
+            } finally {
+                processLoad = false;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
     }
 
     public LongProperty userIdProperty() {
@@ -71,7 +87,7 @@ public class HistoryDatabaseFacade implements Closeable {
         executor.shutdown();
     }
 
-    private class LoadTask implements Runnable{
+    private static class LoadTask implements Callable<Collection<HistoryItem>> {
         private final long userId;
 
         public LoadTask(long userId) {
@@ -79,19 +95,8 @@ public class HistoryDatabaseFacade implements Closeable {
         }
 
         @Override
-        public void run() {
-            try {
-                Collection<HistoryItem> newItems = DAOFactory.getInstance().getHistoryItemDAO().getByUserId(userId);
-                processLoad = true;
-                try {
-                    items.clear();
-                    items.addAll(newItems);//TODO merge values?
-                } finally {
-                    processLoad = false;
-                }
-            } catch (Exception e){
-                e.printStackTrace();
-            }
+        public Collection<HistoryItem> call() throws Exception {
+            return DAOFactory.getInstance().getHistoryItemDAO().getByUserId(userId);
         }
     }
 

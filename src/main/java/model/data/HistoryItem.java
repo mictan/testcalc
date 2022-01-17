@@ -4,7 +4,7 @@ import model.actions.AAction;
 import model.database.converters.ActionToStringConverter;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity(name = "HistoryItem")
@@ -17,8 +17,7 @@ public class HistoryItem {
     @Column(name = "user_id", nullable = false)
     private Long userId = -1L;
     @Column(name = "time", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date time;
+    private Timestamp time;
     @Column(name = "left")
     private Double left;
     @Column(name = "action")
@@ -32,7 +31,7 @@ public class HistoryItem {
     public HistoryItem(){}
 
     public HistoryItem(Double left, AAction action, Double right, Double result) {
-        this.time = new Date();
+        this.time = new Timestamp(System.currentTimeMillis());
         this.left = left;
         this.action = action;
         this.right = right;
@@ -55,11 +54,11 @@ public class HistoryItem {
         this.userId = userId;
     }
 
-    public Date getTime() {
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 
